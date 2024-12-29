@@ -35,6 +35,7 @@ public class GameScreen implements Screen {
     Texture winTexture;
     Music st;
     Texture background;
+    Shark shark;
 
 
     public GameScreen(Turtle game){
@@ -49,6 +50,8 @@ public class GameScreen implements Screen {
         rock = new Rock(0,0,stage1);
         wood = new Wood(0,0,stage1);
         starFish = new StarFish(100,100,stage1);
+        shark = new Shark(200,300,stage1);
+        player = new Player(600,300,stage1);
         winTexture = new Texture("you-win.png");
         st = Gdx.audio.newMusic(Gdx.files.internal("Water_Drop.ogg"));
 
@@ -65,7 +68,7 @@ public class GameScreen implements Screen {
         for(int j= 0; j<4;j++){
             spawnStarFish();
         }
-        player = new Player(600,300,stage1);
+
         countStarFish = 5;
 
     }

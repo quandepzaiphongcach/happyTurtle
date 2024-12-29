@@ -36,6 +36,8 @@ public class GameScreen implements Screen {
     Music st;
     Texture background;
     Shark shark;
+    Texture explosion1;
+    int lastTime;
 
 
     public GameScreen(Turtle game){
@@ -46,6 +48,7 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 
         explosion = new Texture("whirlpool.png");
+        explosion1 = new Texture("sparkle.png");
         background = new Texture("water.jpg");
         rock = new Rock(0,0,stage1);
         wood = new Wood(0,0,stage1);
@@ -70,6 +73,7 @@ public class GameScreen implements Screen {
         }
 
         countStarFish = 5;
+        lastTime = 0;
 
     }
     @Override
@@ -87,6 +91,7 @@ public class GameScreen implements Screen {
         game.font.draw(game.batch, "StarFish : "+ countStarFish,0,650);
         game.batch.end();
         player.isCollison = false;
+        lastTime++;
         for(Wood wood1:woodArray) {
             if (Intersector.overlapConvexPolygons(player.polygon, wood1.polygon)) {
                 if(player.speed != 0) {
@@ -128,17 +133,29 @@ public class GameScreen implements Screen {
         }
         for(StarFish starFish1:starFishArray){
             if(Intersector.overlapConvexPolygons(player.polygon,starFish1.polygon)){
-                st.play();
-                countStarFish--;
-                Explosion no = new Explosion(explosion,5,2);
-                no.setPosition(starFish1.getX(),starFish1.getY());
-                stage1.addActor(no);
-                starFish1.remove();
-                starFish1.polygon.setPosition(1000000,10000000);
+                if(countStarFish>1) {
+                    st.play();
+                    countStarFish--;
+                    Explosion no = new Explosion(explosion, 5, 2);
+                    no.setPosition(starFish1.getX(), starFish1.getY());
+                    stage1.addActor(no);
+                    starFish1.remove();
+                    starFish1.polygon.setPosition(1000000, 10000000);
+                }else {
+                    st.play();
+                    countStarFish--;
+                    Explosion no = new Explosion(explosion1, 8, 8);
+                    no.setPosition(starFish1.getX(), starFish1.getY());
+                    stage1.addActor(no);
+                    starFish1.remove();
+                    starFish1.polygon.setPosition(1000000, 10000000);
+                }
             }
         }
-        if(countStarFish == 0){
-            game.setScreen(new WinScreen(game));
+        if(lastTime==180) {
+            if (countStarFish == 0) {
+                game.setScreen(new WinScreen(game));
+            }
         }
 
         stage1.act(Gdx.graphics.getDeltaTime());

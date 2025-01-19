@@ -20,7 +20,9 @@ public class Player extends Actor {
     Animation<TextureRegion> animation;
     float time;
     float speed;
-    boolean isCollison = false; // cái này để xem có chạm đá, gỗ hay ko
+    boolean isCollison = false;
+    float locateX;
+    float locateY;
 
 
     Player(float x, float y , Stage s){
@@ -28,6 +30,7 @@ public class Player extends Actor {
         Texture texture = new Texture("turtle.png");
        int cot = 6;
         int hang = 1;
+        setPosition(x,y);
         setSize(texture.getWidth()/cot, texture.getHeight()/hang);
         float speed = 0.05f;
         TextureRegion[][] tam = TextureRegion.split(texture, texture.getWidth()/cot, texture.getHeight()/hang);// đưa tất cả vào danh một danh sách ảnh, vì 6 cột 1 hàng nên sẽ có 6 phần tử: 6 x 1
@@ -72,27 +75,30 @@ public class Player extends Actor {
     public void act(float delta) {
         polygon.setPosition(getX(),getY());
         polygon.setRotation(getRotation());
-        if(!isCollison){ // nếu không chạm thì mới được điều khiển
-            if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+
+        if(!isCollison) {
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 rotateBy(-2);
 
             }
-            if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 rotateBy(2);
             }
 
-            if(Gdx.input.isKeyPressed(Input.Keys.UP)){
-                if (speed<4.05f) {
+            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                locateX += speed*MathUtils.cosDeg(this.getRotation());
+                locateY += speed*MathUtils.sinDeg(this.getRotation());
+                if (speed < 4.05f) {
                     speed = speed + 0.05f;
                 }
                 time += delta;
 
-            }else {
-                speed = speed*0.99f; // Nhân để nó tự giảm dần về 0, xịn hơn là trừ
+            } else {
+                speed = speed * 0.99f;
             }
-        }
-        moveBy(speed * MathUtils.cosDeg(this.getRotation()), speed* MathUtils.sinDeg(this.getRotation()));
+            moveBy(speed * MathUtils.cosDeg(this.getRotation()), speed * MathUtils.sinDeg(this.getRotation()));
 
+        }
     }
     public Polygon getPolygon(){
         return polygon;

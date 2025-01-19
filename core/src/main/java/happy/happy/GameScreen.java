@@ -13,7 +13,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -38,6 +42,9 @@ public class GameScreen implements Screen {
     Shark shark;
     Texture explosion1;
     int lastTime;
+    Texture resestImage;
+
+
 
 
     public GameScreen(Turtle game){
@@ -49,12 +56,14 @@ public class GameScreen implements Screen {
 
         explosion = new Texture("whirlpool.png");
         explosion1 = new Texture("sparkle.png");
-        background = new Texture("water.jpg");
+        resestImage = new Texture("undo.png");
+
+        backGround = new BackGround(0,0,stage1);
         rock = new Rock(0,0,stage1);
         wood = new Wood(0,0,stage1);
         starFish = new StarFish(100,100,stage1);
         shark = new Shark(200,300,stage1);
-        player = new Player(600,300,stage1);
+        player = new Player(0,0,stage1);
         winTexture = new Texture("you-win.png");
         st = Gdx.audio.newMusic(Gdx.files.internal("Water_Drop.ogg"));
 
@@ -78,6 +87,20 @@ public class GameScreen implements Screen {
     }
     @Override
     public void show() {
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        style.font = game.font;
+        style.fontColor = Color.WHITE;
+        style.up = new TextureRegionDrawable(resestImage);
+        TextButton resetButton = new TextButton("",style);
+        resetButton.setPosition(Gdx.graphics.getWidth()*0.95f - resetButton.getWidth()/2,
+            Gdx.graphics.getHeight()*0.9f - resetButton.getHeight()/2) ;
+        game.stage.addActor(resetButton);
+        Gdx.input.setInputProcessor(game.stage);
+        resetButton.addListener(new ClickListener(){
+            public void clicked(InputEvent event, float x, float y){
+                game.setScreen(new GameScreen(game));
+            }
+        });
 
     }
 
@@ -86,12 +109,19 @@ public class GameScreen implements Screen {
         ScreenUtils.clear(Color.BLACK);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
-        game.batch.begin();
-        game.batch.draw(background, 0,0,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        game.font.draw(game.batch, "StarFish : "+ countStarFish,0,650);
-        game.batch.end();
+
         player.isCollison = false;
-        lastTime++;
+
+        if((player.getX()>750-(player.speed * MathUtils.cosDeg(player.getRotation()))-player.getWidth()/2)&&(player.getX()<1500-(player.speed * MathUtils.cosDeg(player.getRotation()))-player.getWidth()/2)) {
+                stage1.getCamera().position.x = player.getX()+ player.getWidth()/2;
+        }
+        if((player.getY()>350- (player.speed*MathUtils.sinDeg(player.getRotation()))-player.getHeight()/2)&&(player.getY()<700-(player.speed*MathUtils.sinDeg(player.getRotation()))-player.getHeight()/2)) {
+                stage1.getCamera().position.y = player.getY()+player.getHeight()/2;
+        }
+
+
+
+
         for(Wood wood1:woodArray) {
             if (Intersector.overlapConvexPolygons(player.polygon, wood1.polygon)) {
                 if(player.speed != 0) {
@@ -152,19 +182,23 @@ public class GameScreen implements Screen {
                 }
             }
         }
-        if(lastTime==180) {
+
             if (countStarFish == 0) {
-                game.setScreen(new WinScreen(game));
+                lastTime++;
+
             }
+        if(lastTime>180) {
+            game.setScreen(new WinScreen(game));
         }
+        game.batch.begin();
+        game.font.draw(game.batch, "StarFish : "+ countStarFish,0,650);
+        game.batch.end();
 
         stage1.act(Gdx.graphics.getDeltaTime());
         stage1.draw();
-        //shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        //shapeRenderer.setColor(Color.RED);
-        //shapeRenderer.polygon(player.getPolygon().getTransformedVertices());
-        //shapeRenderer.polygon(rock.getPolygon().getTransformedVertices());
-        //shapeRenderer.polygon(wood.getPolygon().getTransformedVertices());
+        game.stage.act();
+        game.stage.draw();
+
         shapeRenderer.end();
     }
 

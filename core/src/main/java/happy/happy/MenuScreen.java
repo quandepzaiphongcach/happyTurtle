@@ -28,6 +28,7 @@ public class MenuScreen implements Screen {
         this.game = game;
     }
     Texture button;
+    Stage stage2;
 
     @Override
     public void show() {
@@ -37,10 +38,10 @@ public class MenuScreen implements Screen {
         backgroundImage = new Texture("water-border.jpg");
         startImages = new Texture("message-start.png");
         title = new Texture("starfish-collector.png");
-        button = new Texture("button.png");
+        button=new Texture("button.png") ;
+        stage2 = new Stage();
 
         layout = new GlyphLayout();
-        game.stage = new Stage();
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.font = game.font;
         style.fontColor = Color.WHITE;
@@ -49,7 +50,7 @@ public class MenuScreen implements Screen {
         startButton.setSize(200,80);
         startButton.setPosition(Gdx.graphics.getWidth()*0.4f - startButton.getWidth()/2,
             Gdx.graphics.getHeight()*0.3f - startButton.getHeight()/2) ;
-        game.stage.addActor(startButton);
+        stage2.addActor(startButton);
         startButton.addListener(new ClickListener(){
             public void clicked(InputEvent event, float x, float y){
                 game.setScreen(new GameScreen(game));
@@ -59,13 +60,13 @@ public class MenuScreen implements Screen {
         exitButton.setSize(200,80);
         exitButton.setPosition(Gdx.graphics.getWidth()*0.6f - exitButton.getWidth()/2,
             Gdx.graphics.getHeight()*0.3f - startButton.getHeight()/2) ;
-        game.stage.addActor(exitButton);
+        stage2.addActor(exitButton);
         exitButton.addListener(new ClickListener(){
             public void clicked(InputEvent event, float x, float y){
                  Gdx.app.exit();
             }
         });
-        Gdx.input.setInputProcessor(game.stage);
+        Gdx.input.setInputProcessor(stage2);
 
     }
 
@@ -79,8 +80,8 @@ public class MenuScreen implements Screen {
         game.batch.draw(title,500,500);
         game.batch.draw(startImages,500,300);
         game.batch.end();
-        game.stage.act(Gdx.graphics.getDeltaTime());
-        game.stage.draw();
+        stage2.act(Gdx.graphics.getDeltaTime());
+        stage2.draw();
         if(Gdx.input.isKeyPressed(Input.Keys.S)){
             game.setScreen(new GameScreen(game));
         }
